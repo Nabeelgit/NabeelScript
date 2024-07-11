@@ -115,7 +115,9 @@ print count("banana banana banana", "ana"); // Outputs: 3
 print count(["apple", "banana", "apple"], "apple"); // Outputs: 2</code></pre>
 
             <h3>Control Structures</h3>
-            <p>NabeelScript supports if, else if, and else statements for conditional execution.</p>
+            <p>NabeelScript supports if-else statements, while loops, and for loops for flow control.</p>
+            
+            <h4>If-Else Statements</h4>
             <pre><code>if condition {
     // code to execute if condition is true
 } elseif another_condition {
@@ -123,15 +125,15 @@ print count(["apple", "banana", "apple"], "apple"); // Outputs: 2</code></pre>
 } else {
     // code to execute if all conditions are false
 }</code></pre>
-            <p>Example:</p>
-            <pre><code>x = 10;
 
-if x > 15 {
-    print "x is greater than 15";
-} elseif x > 5 {
-    print "x is greater than 5 but not greater than 15";
-} else {
-    print "x is 5 or less";
+            <h4>While Loops</h4>
+            <pre><code>while condition {
+    // code to execute while condition is true
+}</code></pre>
+
+            <h4>For Loops</h4>
+            <pre><code>for (initialization; condition; update) {
+    // code to execute for each iteration
 }</code></pre>
         </section>
 
@@ -185,6 +187,19 @@ if y % 2 == 0 {
     print "y is even";
 } else {
     print "y is odd";
+}</code></pre>
+
+            <h3>Example 7: Loops</h3>
+            <pre><code>// While loop example
+i = 0;
+while i < 5 {
+    print i;
+    i = i + 1;
+}
+
+// For loop example
+for (j = 0; j < 5; j = j + 1) {
+    print j;
 }</code></pre>
         </section>
     </div>

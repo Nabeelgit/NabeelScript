@@ -19,6 +19,8 @@ pub enum ASTNode {
     Array(Vec<Rc<RefCell<ASTNode>>>),
     IndexAccess(Rc<RefCell<ASTNode>>, Rc<RefCell<ASTNode>>),
     If(Rc<RefCell<ASTNode>>, Vec<Rc<RefCell<ASTNode>>>, Vec<(Rc<RefCell<ASTNode>>, Vec<Rc<RefCell<ASTNode>>>)>, Option<Vec<Rc<RefCell<ASTNode>>>>),
+    While(Rc<RefCell<ASTNode>>, Vec<Rc<RefCell<ASTNode>>>),
+    For(Rc<RefCell<ASTNode>>, Rc<RefCell<ASTNode>>, Rc<RefCell<ASTNode>>, Vec<Rc<RefCell<ASTNode>>>),
 }
 
 pub struct Parser {
@@ -77,6 +79,8 @@ impl Parser {
                     Ok(expr)
                 }
             }
+            Token::While => self.parse_while_statement(),
+            Token::For => self.parse_for_statement(),
             _ => {
                 // For any other token, treat it as an expression
                 let expr = self.parse_expression()?;
@@ -296,5 +300,40 @@ impl Parser {
             }
             _ => Err(format!("Unexpected token: {:?}", self.current_token)),
         }
+    }
+
+    fn parse_for_statement(&mut self) -> Result<Rc<RefCell<ASTNode>>, String> {
+        self.eat(Token::For)?;
+        self.eat(Token::LParen)?;
+        let init = self.parse_for_expression()?;
+        self.eat(Token::Semicolon)?;
+        let condition = self.parse_expression()?;
+        self.eat(Token::Semicolon)?;
+        let update = self.parse_for_expression()?;
+        self.eat(Token::RParen)?;
+        self.eat(Token::LBrace)?;
+        let block = self.parse_block()?;
+        Ok(Rc::new(RefCell::new(ASTNode::For(init, condition, update, block))))
+    }
+
+    fn parse_for_expression(&mut self) -> Result<Rc<RefCell<ASTNode>>, String> {
+        if let Token::Identifier(name) = &self.current_token {
+            let name = name.clone();
+            self.eat(Token::Identifier(name.clone()))?;
+            if self.current_token == Token::Assign {
+                self.eat(Token::Assign)?;
+                let expr = self.parse_expression()?;
+                return Ok(Rc::new(RefCell::new(ASTNode::Assign(name, expr))));
+            }
+        }
+        self.parse_expression()
+    }
+
+    fn parse_while_statement(&mut self) -> Result<Rc<RefCell<ASTNode>>, String> {
+        self.eat(Token::While)?;
+        let condition = self.parse_expression()?;
+        self.eat(Token::LBrace)?;
+        let block = self.parse_block()?;
+        Ok(Rc::new(RefCell::new(ASTNode::While(condition, block))))
     }
 }

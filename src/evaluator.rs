@@ -164,6 +164,20 @@ impl Evaluator {
                     }
                 }
             }
+            ASTNode::While(condition, block) => {
+                while self.eval_boolean_expression(Rc::clone(condition))? {
+                    self.eval_block(block)?;
+                }
+                Ok(None)
+            }
+            ASTNode::For(init, condition, update, block) => {
+                self.eval(Rc::clone(init))?;
+                while self.eval_boolean_expression(Rc::clone(condition))? {
+                    self.eval_block(block)?;
+                    self.eval(Rc::clone(update))?;
+                }
+                Ok(None)
+            }
         }
     }
 

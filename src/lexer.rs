@@ -35,6 +35,8 @@ pub enum Token {
     ElseIf,
     LBrace,
     RBrace,
+    While,
+    For,
 }
 
 pub struct Lexer {
@@ -171,6 +173,8 @@ impl Lexer {
                     "if" => Ok(Token::If),
                     "else" => Ok(Token::Else),
                     "elseif" => Ok(Token::ElseIf),
+                    "while" => Ok(Token::While),
+                    "for" => Ok(Token::For),
                     _ => Ok(Token::Identifier(ident)),
                 }
             }

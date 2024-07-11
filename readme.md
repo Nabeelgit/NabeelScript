@@ -81,54 +81,9 @@ NabeelScript is a simple, interpreted programming language designed for educatio
    cargo run -- example.nabeel
    ```
 
-## Syntax
+## Documentation
 
-### Comments
-Comments start with `//` and continue to the end of the line.
-
-### Print Statement
-Use the `print` keyword followed by an expression to output values:
-```
-print 1 + 2 * 3;
-print "Hello, World!";
-print true;
-print [1, 2, 3, 4, 5];
-```
-
-### Variables
-Assign values to variables using the `=` operator:
-```
-x = 10;
-y = 20;
-print x + y;
-```
-
-### Arithmetic Operations
-NabeelScript supports basic arithmetic operations:
-```
-print 10 + 5;  // Addition
-print 10 - 5;  // Subtraction
-print 10 * 5;  // Multiplication
-print 10 / 5;  // Division
-```
-
-### Boolean Operations
-NabeelScript supports boolean operations:
-```
-print true && false; // Logical AND
-print true || false; // Logical OR
-print !true; // Logical NOT
-print 5 > 3; // Greater than
-print 10 == 10; // Equal to
-print x < y && y > 10; // Combined comparison
-```
-
-### Arrays
-NabeelScript supports arrays:
-
-- Create arrays using square brackets: `[1, 2, 3, 4, 5]`
-- Access array elements using index: `arr[0]`
-- The `split` function now returns an array of strings
+For detailed documentation of NabeelScript, please visit our [online documentation](https://nabeelgit.github.io/NabeelScript/).
 
 ### Contributing
 
