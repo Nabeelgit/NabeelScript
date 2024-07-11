@@ -1,8 +1,0 @@
-# Ignore compiled executable and debug files
-main.exe
-main.pdb
-
-# Other common Rust ignores
-target/
-**/*.rs.bk
-Cargo.lock
