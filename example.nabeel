@@ -64,3 +64,23 @@ print joined;
 
 // Count elements in an array
 print count(words, "are");
+
+x = 10;
+
+if x > 15 {
+    print "x is greater than 15";
+} elseif x > 5 {
+    print "x is greater than 5 but not greater than 15";
+} else {
+    print "x is 5 or less";
+}
+
+y = 20;
+
+if y == 10 {
+    print "y is 10";
+} elseif y == 20 {
+    print "y is 20";
+} else {
+    print "y is neither 10 nor 20";
+}

@@ -148,7 +148,38 @@ impl Evaluator {
                     _ => Err(format!("Invalid index access")),
                 }
             }
+            ASTNode::If(condition, if_block, else_if_blocks, else_block) => {
+                if self.eval_boolean_expression(Rc::clone(condition))? {
+                    self.eval_block(if_block)
+                } else {
+                    for (else_if_condition, else_if_block) in else_if_blocks {
+                        if self.eval_boolean_expression(Rc::clone(else_if_condition))? {
+                            return self.eval_block(else_if_block);
+                        }
+                    }
+                    if let Some(else_block) = else_block {
+                        self.eval_block(else_block)
+                    } else {
+                        Ok(None)
+                    }
+                }
+            }
         }
+    }
+
+    fn eval_boolean_expression(&mut self, node: Rc<RefCell<ASTNode>>) -> Result<bool, String> {
+        match self.eval(node)? {
+            Some(Value::Boolean(b)) => Ok(b),
+            _ => Err("Expected a boolean expression".to_string()),
+        }
+    }
+
+    fn eval_block(&mut self, block: &[Rc<RefCell<ASTNode>>]) -> Result<Option<Value>, String> {
+        let mut result = None;
+        for statement in block {
+            result = self.eval(Rc::clone(statement))?;
+        }
+        Ok(result)
     }
 
     fn join_function(&mut self, args: &[Rc<RefCell<ASTNode>>]) -> Result<Option<Value>, String> {

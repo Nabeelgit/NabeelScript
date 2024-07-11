@@ -18,6 +18,7 @@ pub enum ASTNode {
     Not(Rc<RefCell<ASTNode>>),
     Array(Vec<Rc<RefCell<ASTNode>>>),
     IndexAccess(Rc<RefCell<ASTNode>>, Rc<RefCell<ASTNode>>),
+    If(Rc<RefCell<ASTNode>>, Vec<Rc<RefCell<ASTNode>>>, Vec<(Rc<RefCell<ASTNode>>, Vec<Rc<RefCell<ASTNode>>>)>, Option<Vec<Rc<RefCell<ASTNode>>>>),
 }
 
 pub struct Parser {
@@ -54,6 +55,7 @@ impl Parser {
 
     fn parse_statement(&mut self) -> Result<Rc<RefCell<ASTNode>>, String> {
         match &self.current_token {
+            Token::If => self.parse_if_statement(),
             Token::Print => {
                 self.eat(Token::Print)?;
                 let expr = self.parse_expression()?;
@@ -82,6 +84,40 @@ impl Parser {
                 Ok(expr)
             }
         }
+    }
+
+    fn parse_if_statement(&mut self) -> Result<Rc<RefCell<ASTNode>>, String> {
+        self.eat(Token::If)?;
+        let condition = self.parse_expression()?;
+        self.eat(Token::LBrace)?;
+        let if_block = self.parse_block()?;
+        let mut else_if_blocks = Vec::new();
+        let mut else_block = None;
+
+        while self.current_token == Token::ElseIf {
+            self.eat(Token::ElseIf)?;
+            let else_if_condition = self.parse_expression()?;
+            self.eat(Token::LBrace)?;
+            let else_if_block = self.parse_block()?;
+            else_if_blocks.push((else_if_condition, else_if_block));
+        }
+
+        if self.current_token == Token::Else {
+            self.eat(Token::Else)?;
+            self.eat(Token::LBrace)?;
+            else_block = Some(self.parse_block()?);
+        }
+
+        Ok(Rc::new(RefCell::new(ASTNode::If(condition, if_block, else_if_blocks, else_block))))
+    }
+
+    fn parse_block(&mut self) -> Result<Vec<Rc<RefCell<ASTNode>>>, String> {
+        let mut statements = Vec::new();
+        while self.current_token != Token::RBrace {
+            statements.push(self.parse_statement()?);
+        }
+        self.eat(Token::RBrace)?;
+        Ok(statements)
     }
 
     fn parse_expression(&mut self) -> Result<Rc<RefCell<ASTNode>>, String> {

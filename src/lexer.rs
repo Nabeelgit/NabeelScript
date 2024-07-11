@@ -30,6 +30,11 @@ pub enum Token {
     Not,     // !
     LBracket,
     RBracket,
+    If,
+    Else,
+    ElseIf,
+    LBrace,
+    RBrace,
 }
 
 pub struct Lexer {
@@ -163,6 +168,9 @@ impl Lexer {
                     "count" => Ok(Token::Count),
                     "true" => Ok(Token::True),
                     "false" => Ok(Token::False),
+                    "if" => Ok(Token::If),
+                    "else" => Ok(Token::Else),
+                    "elseif" => Ok(Token::ElseIf),
                     _ => Ok(Token::Identifier(ident)),
                 }
             }
@@ -177,6 +185,14 @@ impl Lexer {
             Some(']') => {
                 self.read_char();
                 Ok(Token::RBracket)
+            }
+            Some('{') => {
+                self.read_char();
+                Ok(Token::LBrace)
+            }
+            Some('}') => {
+                self.read_char();
+                Ok(Token::RBrace)
             }
             None => Ok(Token::EOF),
             _ => Err(format!("Unknown character: {}", self.current_char.unwrap())),

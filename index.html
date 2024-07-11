@@ -60,7 +60,7 @@
     <div class="container main">
         <section id="introduction">
             <h2>Introduction</h2>
-            <p>Welcome to the NabeelScript documentation. NabeelScript is a simple, interpreted programming language designed for educational purposes. It supports basic arithmetic operations, variable assignments, boolean operations, arrays, and string manipulation functions.</p>
+            <p>Welcome to the NabeelScript documentation. NabeelScript is a simple, interpreted programming language designed for educational purposes. It supports basic arithmetic operations, variable assignments, boolean operations, arrays, string manipulation functions, and control structures.</p>
         </section>
 
         <section id="syntax">
@@ -113,6 +113,26 @@ print words[1];  // Outputs: world</code></pre>
 print split("apple-banana-cherry", "-");   // Outputs: ["apple", "banana", "cherry"]
 print count("banana banana banana", "ana"); // Outputs: 3
 print count(["apple", "banana", "apple"], "apple"); // Outputs: 2</code></pre>
+
+            <h3>Control Structures</h3>
+            <p>NabeelScript supports if, else if, and else statements for conditional execution.</p>
+            <pre><code>if condition {
+    // code to execute if condition is true
+} elseif another_condition {
+    // code to execute if another_condition is true
+} else {
+    // code to execute if all conditions are false
+}</code></pre>
+            <p>Example:</p>
+            <pre><code>x = 10;
+
+if x > 15 {
+    print "x is greater than 15";
+} elseif x > 5 {
+    print "x is greater than 5 but not greater than 15";
+} else {
+    print "x is 5 or less";
+}</code></pre>
         </section>
 
         <section id="examples">
@@ -148,6 +168,24 @@ sum = numbers[0] + numbers[1] + numbers[2] + numbers[3] + numbers[4];
 average = sum / 5;
 print "The average is: " + average;
 print "Is the average greater than 3? " + (average > 3);</code></pre>
+
+            <h3>Example 6: Control Structures</h3>
+            <pre><code>x = 10;
+y = 20;
+
+if x > y {
+    print "x is greater than y";
+} elseif x < y {
+    print "x is less than y";
+} else {
+    print "x is equal to y";
+}
+
+if y % 2 == 0 {
+    print "y is even";
+} else {
+    print "y is odd";
+}</code></pre>
         </section>
     </div>
 </body>
