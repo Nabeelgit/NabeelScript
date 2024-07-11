@@ -41,5 +41,8 @@ fn main() {
         }
     };
     let mut evaluator = Evaluator::new();
-    evaluator.eval(ast);
+    match evaluator.eval(ast) {
+        Ok(_) => (),
+        Err(e) => eprintln!("Error evaluating AST: {}", e),
+    }
 }

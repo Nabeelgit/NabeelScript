@@ -6,8 +6,9 @@ NabeelScript is a simple, interpreted programming language designed for educatio
 
 - Basic arithmetic operations (+, -, *, /)
 - Variable assignments
-- Printing numbers and strings
+- Printing numbers, strings, and booleans
 - Support for comments
+- Boolean operations (==, !=, <, >, <=, >=, &&, ||, !)
 
 ## Getting Started
 
@@ -52,6 +53,18 @@ NabeelScript is a simple, interpreted programming language designed for educatio
 
    // Another string example
    print "NabeelScript is fun!";
+
+   // Boolean operations
+   print true;
+   print false;
+   print 5 > 3;
+   print 10 == 10;
+   print true && false;
+   print true || false;
+   print !true;
+   x = 15;
+   y = 20;
+   print x < y && y > 10;
    ```
 
 2. Run the interpreter:
@@ -69,6 +82,7 @@ Use the `print` keyword followed by an expression to output values:
 ```
 print 1 + 2 * 3;
 print "Hello, World!";
+print true;
 ```
 
 ### Variables
@@ -86,6 +100,17 @@ print 10 + 5;  // Addition
 print 10 - 5;  // Subtraction
 print 10 * 5;  // Multiplication
 print 10 / 5;  // Division
+```
+
+### Boolean Operations
+NabeelScript supports boolean operations:
+```
+print true && false; // Logical AND
+print true || false; // Logical OR
+print !true; // Logical NOT
+print 5 > 3; // Greater than
+print 10 == 10; // Equal to
+print x < y && y > 10; // Combined comparison
 ```
 
 ## Contributing

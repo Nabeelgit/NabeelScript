@@ -11,6 +11,11 @@ pub enum ASTNode {
     Assign(String, Rc<RefCell<ASTNode>>),
     Print(Rc<RefCell<ASTNode>>),
     Program(Vec<Rc<RefCell<ASTNode>>>),
+    FunctionCall(String, Vec<Rc<RefCell<ASTNode>>>),
+    Boolean(bool),
+    Comparison(Rc<RefCell<ASTNode>>, Token, Rc<RefCell<ASTNode>>),
+    LogicalOp(Rc<RefCell<ASTNode>>, Token, Rc<RefCell<ASTNode>>),
+    Not(Rc<RefCell<ASTNode>>),
 }
 
 pub struct Parser {
@@ -56,12 +61,20 @@ impl Parser {
             Token::Identifier(name) => {
                 let name = name.clone();
                 self.eat(Token::Identifier(name.clone()))?;
-                self.eat(Token::Assign)?;
-                let expr = self.parse_expression()?;
-                self.eat(Token::Semicolon)?;
-                Ok(Rc::new(RefCell::new(ASTNode::Assign(name, expr))))
+                if self.current_token == Token::Assign {
+                    self.eat(Token::Assign)?;
+                    let expr = self.parse_expression()?;
+                    self.eat(Token::Semicolon)?;
+                    Ok(Rc::new(RefCell::new(ASTNode::Assign(name, expr))))
+                } else {
+                    // If it's not an assignment, treat it as an expression
+                    let expr = self.parse_expression()?;
+                    self.eat(Token::Semicolon)?;
+                    Ok(expr)
+                }
             }
             _ => {
+                // For any other token, treat it as an expression
                 let expr = self.parse_expression()?;
                 self.eat(Token::Semicolon)?;
                 Ok(expr)
@@ -70,12 +83,56 @@ impl Parser {
     }
 
     fn parse_expression(&mut self) -> Result<Rc<RefCell<ASTNode>>, String> {
+        self.parse_logical_or()
+    }
+
+    fn parse_logical_or(&mut self) -> Result<Rc<RefCell<ASTNode>>, String> {
+        let mut node = self.parse_logical_and()?;
+
+        while self.current_token == Token::Or {
+            let op = self.current_token.clone();
+            self.eat(Token::Or)?;
+            let right = self.parse_logical_and()?;
+            node = Rc::new(RefCell::new(ASTNode::LogicalOp(node, op, right)));
+        }
+
+        Ok(node)
+    }
+
+    fn parse_logical_and(&mut self) -> Result<Rc<RefCell<ASTNode>>, String> {
+        let mut node = self.parse_equality()?;
+
+        while self.current_token == Token::And {
+            let op = self.current_token.clone();
+            self.eat(Token::And)?;
+            let right = self.parse_equality()?;
+            node = Rc::new(RefCell::new(ASTNode::LogicalOp(node, op, right)));
+        }
+
+        Ok(node)
+    }
+
+    fn parse_equality(&mut self) -> Result<Rc<RefCell<ASTNode>>, String> {
+        let mut node = self.parse_comparison()?;
+
+        while self.current_token == Token::Eq || self.current_token == Token::NotEq {
+            let op = self.current_token.clone();
+            self.eat(self.current_token.clone())?;
+            let right = self.parse_comparison()?;
+            node = Rc::new(RefCell::new(ASTNode::Comparison(node, op, right)));
+        }
+
+        Ok(node)
+    }
+
+    fn parse_comparison(&mut self) -> Result<Rc<RefCell<ASTNode>>, String> {
         let mut node = self.parse_term()?;
 
-        while self.current_token == Token::Plus || self.current_token == Token::Minus {
-            let token = self.current_token.clone();
-            self.eat(token.clone())?;
-            node = Rc::new(RefCell::new(ASTNode::BinaryOp(node, token, self.parse_term()?)));
+        while matches!(self.current_token, Token::Lt | Token::Gt | Token::LtEq | Token::GtEq) {
+            let op = self.current_token.clone();
+            self.eat(self.current_token.clone())?;
+            let right = self.parse_term()?;
+            node = Rc::new(RefCell::new(ASTNode::Comparison(node, op, right)));
         }
 
         Ok(node)
@@ -84,37 +141,89 @@ impl Parser {
     fn parse_term(&mut self) -> Result<Rc<RefCell<ASTNode>>, String> {
         let mut node = self.parse_factor()?;
 
-        while self.current_token == Token::Star || self.current_token == Token::Slash {
-            let token = self.current_token.clone();
-            self.eat(token.clone())?;
-            node = Rc::new(RefCell::new(ASTNode::BinaryOp(node, token, self.parse_factor()?)));
+        while self.current_token == Token::Plus || self.current_token == Token::Minus {
+            let op = self.current_token.clone();
+            self.eat(self.current_token.clone())?;
+            let right = self.parse_factor()?;
+            node = Rc::new(RefCell::new(ASTNode::BinaryOp(node, op, right)));
         }
 
         Ok(node)
     }
 
     fn parse_factor(&mut self) -> Result<Rc<RefCell<ASTNode>>, String> {
+        let mut node = self.parse_unary()?;
+
+        while self.current_token == Token::Star || self.current_token == Token::Slash {
+            let op = self.current_token.clone();
+            self.eat(self.current_token.clone())?;
+            let right = self.parse_unary()?;
+            node = Rc::new(RefCell::new(ASTNode::BinaryOp(node, op, right)));
+        }
+
+        Ok(node)
+    }
+
+    fn parse_unary(&mut self) -> Result<Rc<RefCell<ASTNode>>, String> {
+        if self.current_token == Token::Not {
+            self.eat(Token::Not)?;
+            let expr = self.parse_unary()?;
+            Ok(Rc::new(RefCell::new(ASTNode::Not(expr))))
+        } else {
+            self.parse_primary()
+        }
+    }
+
+    fn parse_primary(&mut self) -> Result<Rc<RefCell<ASTNode>>, String> {
         match &self.current_token {
-            Token::Number(value) => {
-                let value = *value;
+            Token::Number(n) => {
+                let value = *n;
                 self.eat(Token::Number(value))?;
                 Ok(Rc::new(RefCell::new(ASTNode::Number(value))))
             }
-            Token::StringLiteral(value) => {
-                let value = value.clone();
+            Token::StringLiteral(s) => {
+                let value = s.clone();
                 self.eat(Token::StringLiteral(value.clone()))?;
                 Ok(Rc::new(RefCell::new(ASTNode::StringLiteral(value))))
             }
+            Token::True => {
+                self.eat(Token::True)?;
+                Ok(Rc::new(RefCell::new(ASTNode::Boolean(true))))
+            }
+            Token::False => {
+                self.eat(Token::False)?;
+                Ok(Rc::new(RefCell::new(ASTNode::Boolean(false))))
+            }
             Token::Identifier(name) => {
-                let name = name.clone();
-                self.eat(Token::Identifier(name.clone()))?;
-                Ok(Rc::new(RefCell::new(ASTNode::Identifier(name))))
+                let value = name.clone();
+                self.eat(Token::Identifier(value.clone()))?;
+                Ok(Rc::new(RefCell::new(ASTNode::Identifier(value))))
             }
             Token::LParen => {
                 self.eat(Token::LParen)?;
-                let node = self.parse_expression()?;
+                let expr = self.parse_expression()?;
                 self.eat(Token::RParen)?;
-                Ok(node)
+                Ok(expr)
+            }
+            Token::Join | Token::Split | Token::Count => {
+                let func_name = match &self.current_token {
+                    Token::Join => "join",
+                    Token::Split => "split",
+                    Token::Count => "count",
+                    _ => unreachable!(),
+                };
+                self.eat(self.current_token.clone())?;
+                self.eat(Token::LParen)?;
+                let mut args = Vec::new();
+                if self.current_token != Token::RParen {
+                    args.push(self.parse_expression()?);
+                    while self.current_token == Token::Comma {
+                        self.eat(Token::Comma)?;
+                        args.push(self.parse_expression()?);
+                    }
+                }
+                self.eat(Token::RParen)?;
+                Ok(Rc::new(RefCell::new(ASTNode::FunctionCall(func_name.to_string(), args))))
             }
             _ => Err(format!("Unexpected token: {:?}", self.current_token)),
         }

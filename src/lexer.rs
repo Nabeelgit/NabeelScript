@@ -1,7 +1,7 @@
 #[derive(Debug, PartialEq, Clone)]
 pub enum Token {
     Number(i64),
-    StringLiteral(String), // Added this line
+    StringLiteral(String),
     Plus,
     Minus,
     Star,
@@ -13,6 +13,21 @@ pub enum Token {
     LParen,
     RParen,
     EOF,
+    Join,
+    Split,
+    Count,
+    Comma,
+    True,
+    False,
+    Eq,      // ==
+    NotEq,   // !=
+    Lt,      // <
+    Gt,      // >
+    LtEq,    // <=
+    GtEq,    // >=
+    And,     // &&
+    Or,      // ||
+    Not,     // !
 }
 
 pub struct Lexer {
@@ -66,8 +81,62 @@ impl Lexer {
                 }
             }
             Some('=') => {
-                self.read_char();
-                Ok(Token::Assign)
+                if self.peek() == Some('=') {
+                    self.read_char();
+                    self.read_char();
+                    Ok(Token::Eq)
+                } else {
+                    self.read_char();
+                    Ok(Token::Assign)
+                }
+            }
+            Some('!') => {
+                if self.peek() == Some('=') {
+                    self.read_char();
+                    self.read_char();
+                    Ok(Token::NotEq)
+                } else {
+                    self.read_char();
+                    Ok(Token::Not)
+                }
+            }
+            Some('<') => {
+                if self.peek() == Some('=') {
+                    self.read_char();
+                    self.read_char();
+                    Ok(Token::LtEq)
+                } else {
+                    self.read_char();
+                    Ok(Token::Lt)
+                }
+            }
+            Some('>') => {
+                if self.peek() == Some('=') {
+                    self.read_char();
+                    self.read_char();
+                    Ok(Token::GtEq)
+                } else {
+                    self.read_char();
+                    Ok(Token::Gt)
+                }
+            }
+            Some('&') => {
+                if self.peek() == Some('&') {
+                    self.read_char();
+                    self.read_char();
+                    Ok(Token::And)
+                } else {
+                    Err("Expected '&&'".to_string())
+                }
+            }
+            Some('|') => {
+                if self.peek() == Some('|') {
+                    self.read_char();
+                    self.read_char();
+                    Ok(Token::Or)
+                } else {
+                    Err("Expected '||'".to_string())
+                }
             }
             Some(';') => {
                 self.read_char();
@@ -81,14 +150,23 @@ impl Lexer {
                 self.read_char();
                 Ok(Token::RParen)
             }
-            Some('"') => self.read_string().map(Token::StringLiteral), // Added this line
+            Some('"') => self.read_string().map(Token::StringLiteral),
             Some(c) if c.is_digit(10) => self.read_number().map(Token::Number),
             Some(c) if c.is_alphabetic() => {
                 let ident = self.read_identifier();
                 match ident.as_str() {
                     "print" => Ok(Token::Print),
+                    "join" => Ok(Token::Join),
+                    "split" => Ok(Token::Split),
+                    "count" => Ok(Token::Count),
+                    "true" => Ok(Token::True),
+                    "false" => Ok(Token::False),
                     _ => Ok(Token::Identifier(ident)),
                 }
+            }
+            Some(',') => {
+                self.read_char();
+                Ok(Token::Comma)
             }
             None => Ok(Token::EOF),
             _ => Err(format!("Unknown character: {}", self.current_char.unwrap())),
@@ -135,5 +213,9 @@ impl Lexer {
         let result = self.input[start..self.position - 1].to_string();
         self.read_char(); // Skip the closing quote
         Ok(result)
+    }
+
+    fn peek(&self) -> Option<char> {
+        self.input.chars().nth(self.position)
     }
 }

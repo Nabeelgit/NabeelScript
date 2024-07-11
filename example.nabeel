@@ -17,3 +17,23 @@ print c; // This will print 45
 
 // Another string example
 print "NabeelScript is fun!";
+
+// Join function
+print join("-", "apple, banana, cherry");
+
+// Split function
+print split("apple-banana-cherry", "-");
+
+// Count function
+print count("banana banana banana", "ana");
+
+print true;
+print false;
+print 5 > 3;
+print 10 == 10;
+print true && false;
+print true || false;
+print !true;
+x = 15;
+y = 20;
+print x < y && y > 10;
