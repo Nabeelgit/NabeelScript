@@ -8,5 +8,11 @@ if %errorlevel% neq 0 (
     exit /b %errorlevel%
 )
 
-rem Run the compiled executable
-main.exe
+rem Check if a .nabeel file is provided as an argument
+if "%~1"=="" (
+    echo Usage: %~nx0 ^<file.nabeel^>
+    exit /b 1
+)
+
+rem Run the compiled executable with the provided .nabeel file
+main.exe "%~1"

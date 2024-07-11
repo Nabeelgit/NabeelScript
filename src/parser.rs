@@ -1,12 +1,16 @@
 use crate::lexer::{Lexer, Token};
+use std::rc::Rc;
+use std::cell::RefCell;
 
 #[derive(Debug)]
 pub enum ASTNode {
     Number(i64),
-    BinaryOp(Box<ASTNode>, Token, Box<ASTNode>),
+    StringLiteral(String),
+    BinaryOp(Rc<RefCell<ASTNode>>, Token, Rc<RefCell<ASTNode>>),
     Identifier(String),
-    Assign(String, Box<ASTNode>),
-    Print(Box<ASTNode>),
+    Assign(String, Rc<RefCell<ASTNode>>),
+    Print(Rc<RefCell<ASTNode>>),
+    Program(Vec<Rc<RefCell<ASTNode>>>),
 }
 
 pub struct Parser {
@@ -29,27 +33,25 @@ impl Parser {
         }
     }
 
-    pub fn parse(&mut self) -> Result<ASTNode, String> {
-        self.parse_statements()
+    pub fn parse(&mut self) -> Result<Rc<RefCell<ASTNode>>, String> {
+        self.parse_program()
     }
 
-    fn parse_statements(&mut self) -> Result<ASTNode, String> {
-        let node = self.parse_statement()?;
+    fn parse_program(&mut self) -> Result<Rc<RefCell<ASTNode>>, String> {
+        let mut statements = Vec::new();
         while self.current_token != Token::EOF {
-            let next_node = self.parse_statement()?;
-            // Combine nodes if needed, for now we assume a single statement
-            return Ok(next_node);
+            statements.push(self.parse_statement()?);
         }
-        Ok(node)
+        Ok(Rc::new(RefCell::new(ASTNode::Program(statements))))
     }
 
-    fn parse_statement(&mut self) -> Result<ASTNode, String> {
+    fn parse_statement(&mut self) -> Result<Rc<RefCell<ASTNode>>, String> {
         match &self.current_token {
             Token::Print => {
                 self.eat(Token::Print)?;
                 let expr = self.parse_expression()?;
                 self.eat(Token::Semicolon)?;
-                Ok(ASTNode::Print(Box::new(expr)))
+                Ok(Rc::new(RefCell::new(ASTNode::Print(expr))))
             }
             Token::Identifier(name) => {
                 let name = name.clone();
@@ -57,47 +59,56 @@ impl Parser {
                 self.eat(Token::Assign)?;
                 let expr = self.parse_expression()?;
                 self.eat(Token::Semicolon)?;
-                Ok(ASTNode::Assign(name, Box::new(expr)))
+                Ok(Rc::new(RefCell::new(ASTNode::Assign(name, expr))))
             }
-            _ => self.parse_expression(),
+            _ => {
+                let expr = self.parse_expression()?;
+                self.eat(Token::Semicolon)?;
+                Ok(expr)
+            }
         }
     }
 
-    fn parse_expression(&mut self) -> Result<ASTNode, String> {
+    fn parse_expression(&mut self) -> Result<Rc<RefCell<ASTNode>>, String> {
         let mut node = self.parse_term()?;
 
         while self.current_token == Token::Plus || self.current_token == Token::Minus {
             let token = self.current_token.clone();
             self.eat(token.clone())?;
-            node = ASTNode::BinaryOp(Box::new(node), token, Box::new(self.parse_term()?));
+            node = Rc::new(RefCell::new(ASTNode::BinaryOp(node, token, self.parse_term()?)));
         }
 
         Ok(node)
     }
 
-    fn parse_term(&mut self) -> Result<ASTNode, String> {
+    fn parse_term(&mut self) -> Result<Rc<RefCell<ASTNode>>, String> {
         let mut node = self.parse_factor()?;
 
         while self.current_token == Token::Star || self.current_token == Token::Slash {
             let token = self.current_token.clone();
             self.eat(token.clone())?;
-            node = ASTNode::BinaryOp(Box::new(node), token, Box::new(self.parse_factor()?));
+            node = Rc::new(RefCell::new(ASTNode::BinaryOp(node, token, self.parse_factor()?)));
         }
 
         Ok(node)
     }
 
-    fn parse_factor(&mut self) -> Result<ASTNode, String> {
+    fn parse_factor(&mut self) -> Result<Rc<RefCell<ASTNode>>, String> {
         match &self.current_token {
             Token::Number(value) => {
                 let value = *value;
                 self.eat(Token::Number(value))?;
-                Ok(ASTNode::Number(value))
+                Ok(Rc::new(RefCell::new(ASTNode::Number(value))))
+            }
+            Token::StringLiteral(value) => {
+                let value = value.clone();
+                self.eat(Token::StringLiteral(value.clone()))?;
+                Ok(Rc::new(RefCell::new(ASTNode::StringLiteral(value))))
             }
             Token::Identifier(name) => {
                 let name = name.clone();
                 self.eat(Token::Identifier(name.clone()))?;
-                Ok(ASTNode::Identifier(name))
+                Ok(Rc::new(RefCell::new(ASTNode::Identifier(name))))
             }
             Token::LParen => {
                 self.eat(Token::LParen)?;

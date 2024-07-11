@@ -1,0 +1,19 @@
+// This is a comment
+print 1 + 2 * 3; // This will print 7
+
+// Printing a string
+print "Hello, World!";
+
+// Variable assignment and printing
+x = 10;
+y = 20;
+print x + y; // This will print 30
+
+// Combined operations
+a = 5;
+b = 10;
+c = a * b + (a - b) / 2;
+print c; // This will print 45
+
+// Another string example
+print "NabeelScript is fun!";

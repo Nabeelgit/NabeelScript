@@ -1,6 +1,7 @@
 #[derive(Debug, PartialEq, Clone)]
 pub enum Token {
     Number(i64),
+    StringLiteral(String), // Added this line
     Plus,
     Minus,
     Star,
@@ -57,7 +58,12 @@ impl Lexer {
             }
             Some('/') => {
                 self.read_char();
-                Ok(Token::Slash)
+                if self.current_char == Some('/') {
+                    self.skip_comment();
+                    self.next_token()
+                } else {
+                    Ok(Token::Slash)
+                }
             }
             Some('=') => {
                 self.read_char();
@@ -75,6 +81,7 @@ impl Lexer {
                 self.read_char();
                 Ok(Token::RParen)
             }
+            Some('"') => self.read_string().map(Token::StringLiteral), // Added this line
             Some(c) if c.is_digit(10) => self.read_number().map(Token::Number),
             Some(c) if c.is_alphabetic() => {
                 let ident = self.read_identifier();
@@ -94,6 +101,12 @@ impl Lexer {
         }
     }
 
+    fn skip_comment(&mut self) {
+        while self.current_char.is_some() && self.current_char.unwrap() != '\n' {
+            self.read_char();
+        }
+    }
+
     fn read_number(&mut self) -> Result<i64, String> {
         let start = self.position - 1;
         while self.current_char.is_some() && self.current_char.unwrap().is_digit(10) {
@@ -108,5 +121,19 @@ impl Lexer {
             self.read_char();
         }
         self.input[start..self.position - 1].to_string()
+    }
+
+    fn read_string(&mut self) -> Result<String, String> {
+        self.read_char(); // Skip the opening quote
+        let start = self.position - 1;
+        while self.current_char.is_some() && self.current_char.unwrap() != '"' {
+            self.read_char();
+        }
+        if self.current_char.is_none() {
+            return Err("Unterminated string literal".to_string());
+        }
+        let result = self.input[start..self.position - 1].to_string();
+        self.read_char(); // Skip the closing quote
+        Ok(result)
     }
 }
