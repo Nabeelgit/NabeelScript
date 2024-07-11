@@ -28,6 +28,8 @@ pub enum Token {
     And,     // &&
     Or,      // ||
     Not,     // !
+    LBracket,
+    RBracket,
 }
 
 pub struct Lexer {
@@ -167,6 +169,14 @@ impl Lexer {
             Some(',') => {
                 self.read_char();
                 Ok(Token::Comma)
+            }
+            Some('[') => {
+                self.read_char();
+                Ok(Token::LBracket)
+            }
+            Some(']') => {
+                self.read_char();
+                Ok(Token::RBracket)
             }
             None => Ok(Token::EOF),
             _ => Err(format!("Unknown character: {}", self.current_char.unwrap())),

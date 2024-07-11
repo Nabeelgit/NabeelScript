@@ -19,13 +19,16 @@ print c; // This will print 45
 print "NabeelScript is fun!";
 
 // Join function
-print join("-", "apple, banana, cherry");
+print join("-", ["apple", "banana", "cherry"]);
 
 // Split function
 print split("apple-banana-cherry", "-");
 
 // Count function
-print count("banana banana banana", "ana");
+sentence = "Hello world! How are you?";
+words = split(sentence, " ");
+print count(sentence, "o");  // Should print the number of 'o's in the sentence
+print count(words, "are");   // Should print 1 (the number of times "are" appears in the array)
 
 print true;
 print false;
@@ -37,3 +40,27 @@ print !true;
 x = 15;
 y = 20;
 print x < y && y > 10;
+
+// Create an array
+arr = [1, 2, 3, 4, 5];
+print arr;
+
+// Access array elements
+print arr[0];
+print arr[4];
+
+// Use split function to create an array
+sentence = "Hello world! How are you?";
+words = split(sentence, " ");
+print words;
+
+// Access elements of the split result
+print words[0];
+print words[3];
+
+// Use join function with an array
+joined = join("-", words);
+print joined;
+
+// Count elements in an array
+print count(words, "are");

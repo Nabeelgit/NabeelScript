@@ -6,9 +6,10 @@ NabeelScript is a simple, interpreted programming language designed for educatio
 
 - Basic arithmetic operations (+, -, *, /)
 - Variable assignments
-- Printing numbers, strings, and booleans
+- Printing numbers, strings, booleans, and arrays
 - Support for comments
 - Boolean operations (==, !=, <, >, <=, >=, &&, ||, !)
+- Array operations (index access, split, join, count)
 
 ## Getting Started
 
@@ -65,6 +66,14 @@ NabeelScript is a simple, interpreted programming language designed for educatio
    x = 15;
    y = 20;
    print x < y && y > 10;
+
+   // Arrays
+   arr = [1, 2, 3, 4, 5];
+   print arr[2]; // Outputs: 3
+
+   sentence = "Hello world";
+   words = split(sentence, " ");
+   print words[1]; // Outputs: world
    ```
 
 2. Run the interpreter:
@@ -83,6 +92,7 @@ Use the `print` keyword followed by an expression to output values:
 print 1 + 2 * 3;
 print "Hello, World!";
 print true;
+print [1, 2, 3, 4, 5];
 ```
 
 ### Variables
@@ -113,7 +123,14 @@ print 10 == 10; // Equal to
 print x < y && y > 10; // Combined comparison
 ```
 
-## Contributing
+### Arrays
+NabeelScript supports arrays:
+
+- Create arrays using square brackets: `[1, 2, 3, 4, 5]`
+- Access array elements using index: `arr[0]`
+- The `split` function now returns an array of strings
+
+### Contributing
 
 Contributions are welcome! Please feel free to submit a Pull Request.
 

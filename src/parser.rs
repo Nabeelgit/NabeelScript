@@ -16,6 +16,8 @@ pub enum ASTNode {
     Comparison(Rc<RefCell<ASTNode>>, Token, Rc<RefCell<ASTNode>>),
     LogicalOp(Rc<RefCell<ASTNode>>, Token, Rc<RefCell<ASTNode>>),
     Not(Rc<RefCell<ASTNode>>),
+    Array(Vec<Rc<RefCell<ASTNode>>>),
+    IndexAccess(Rc<RefCell<ASTNode>>, Rc<RefCell<ASTNode>>),
 }
 
 pub struct Parser {
@@ -170,8 +172,26 @@ impl Parser {
             let expr = self.parse_unary()?;
             Ok(Rc::new(RefCell::new(ASTNode::Not(expr))))
         } else {
-            self.parse_primary()
+            self.parse_postfix()
         }
+    }
+
+    fn parse_postfix(&mut self) -> Result<Rc<RefCell<ASTNode>>, String> {
+        let mut node = self.parse_primary()?;
+
+        loop {
+            match &self.current_token {
+                Token::LBracket => {
+                    self.eat(Token::LBracket)?;
+                    let index = self.parse_expression()?;
+                    self.eat(Token::RBracket)?;
+                    node = Rc::new(RefCell::new(ASTNode::IndexAccess(node, index)));
+                }
+                _ => break,
+            }
+        }
+
+        Ok(node)
     }
 
     fn parse_primary(&mut self) -> Result<Rc<RefCell<ASTNode>>, String> {
@@ -224,6 +244,19 @@ impl Parser {
                 }
                 self.eat(Token::RParen)?;
                 Ok(Rc::new(RefCell::new(ASTNode::FunctionCall(func_name.to_string(), args))))
+            }
+            Token::LBracket => {
+                self.eat(Token::LBracket)?;
+                let mut elements = Vec::new();
+                if self.current_token != Token::RBracket {
+                    elements.push(self.parse_expression()?);
+                    while self.current_token == Token::Comma {
+                        self.eat(Token::Comma)?;
+                        elements.push(self.parse_expression()?);
+                    }
+                }
+                self.eat(Token::RBracket)?;
+                Ok(Rc::new(RefCell::new(ASTNode::Array(elements))))
             }
             _ => Err(format!("Unexpected token: {:?}", self.current_token)),
         }

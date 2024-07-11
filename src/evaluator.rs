@@ -13,6 +13,7 @@ pub enum Value {
     Number(i64),
     String(String),
     Boolean(bool),
+    Array(Vec<Value>),
 }
 
 impl Evaluator {
@@ -65,6 +66,7 @@ impl Evaluator {
                         Value::Number(n) => println!("{}", n),
                         Value::String(s) => println!("{}", s),
                         Value::Boolean(b) => println!("{}", b),
+                        Value::Array(arr) => println!("{:?}", arr),
                     }
                 }
                 Ok(None)
@@ -123,6 +125,29 @@ impl Evaluator {
                     _ => Err(format!("Cannot apply 'not' to non-boolean value: {:?}", val)),
                 }
             }
+            ASTNode::Array(elements) => {
+                let mut array_values = Vec::new();
+                for element in elements {
+                    if let Some(value) = self.eval(Rc::clone(element))? {
+                        array_values.push(value);
+                    }
+                }
+                Ok(Some(Value::Array(array_values)))
+            }
+            ASTNode::IndexAccess(array, index) => {
+                let array_value = self.eval(Rc::clone(array))?.unwrap();
+                let index_value = self.eval(Rc::clone(index))?.unwrap();
+                match (array_value, index_value) {
+                    (Value::Array(arr), Value::Number(idx)) => {
+                        if idx < 0 || idx >= arr.len() as i64 {
+                            Err(format!("Index out of bounds: {}", idx))
+                        } else {
+                            Ok(Some(arr[idx as usize].clone()))
+                        }
+                    }
+                    _ => Err(format!("Invalid index access")),
+                }
+            }
         }
     }
 
@@ -135,10 +160,18 @@ impl Evaluator {
             _ => return Err("First argument of join must be a string".to_string()),
         };
         let elements = match self.eval(Rc::clone(&args[1]))?.unwrap() {
-            Value::String(s) => s.split(',').map(|s| s.trim().to_string()).collect::<Vec<String>>(),
-            _ => return Err("Second argument of join must be a string".to_string()),
+            Value::Array(arr) => arr,
+            _ => return Err("Second argument of join must be an array".to_string()),
         };
-        Ok(Some(Value::String(elements.join(&separator))))
+        
+        let joined_string = elements.iter().map(|value| match value {
+            Value::String(s) => s.clone(),
+            Value::Number(n) => n.to_string(),
+            Value::Boolean(b) => b.to_string(),
+            Value::Array(_) => "[array]".to_string(), // You might want to handle nested arrays differently
+        }).collect::<Vec<String>>().join(&separator);
+        
+        Ok(Some(Value::String(joined_string)))
     }
 
     fn split_function(&mut self, args: &[Rc<RefCell<ASTNode>>]) -> Result<Option<Value>, String> {
@@ -153,21 +186,34 @@ impl Evaluator {
             Value::String(s) => s,
             _ => return Err("Second argument of split must be a string".to_string()),
         };
-        Ok(Some(Value::String(string.split(&separator).collect::<Vec<&str>>().join(","))))
+        let result: Vec<Value> = string.split(&separator)
+            .map(|s| Value::String(s.to_string()))
+            .collect();
+        Ok(Some(Value::Array(result)))
     }
 
     fn count_function(&mut self, args: &[Rc<RefCell<ASTNode>>]) -> Result<Option<Value>, String> {
         if args.len() != 2 {
             return Err("count function requires 2 arguments".to_string());
         }
-        let string = match self.eval(Rc::clone(&args[0]))?.unwrap() {
-            Value::String(s) => s,
-            _ => return Err("First argument of count must be a string".to_string()),
-        };
-        let substring = match self.eval(Rc::clone(&args[1]))?.unwrap() {
-            Value::String(s) => s,
-            _ => return Err("Second argument of count must be a string".to_string()),
-        };
-        Ok(Some(Value::Number(string.matches(&substring).count() as i64)))
+        let first_arg = self.eval(Rc::clone(&args[0]))?.unwrap();
+        let second_arg = self.eval(Rc::clone(&args[1]))?.unwrap();
+
+        match (first_arg, second_arg) {
+            (Value::String(s), Value::String(substr)) => {
+                Ok(Some(Value::Number(s.matches(&substr).count() as i64)))
+            }
+            (Value::Array(arr), Value::String(substr)) => {
+                let count = arr.iter().filter(|&v| {
+                    if let Value::String(s) = v {
+                        s == &substr
+                    } else {
+                        false
+                    }
+                }).count();
+                Ok(Some(Value::Number(count as i64)))
+            }
+            _ => Err("count function arguments must be (string, string) or (array, string)".to_string()),
+        }
     }
 }

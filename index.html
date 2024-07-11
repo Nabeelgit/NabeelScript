@@ -60,7 +60,7 @@
     <div class="container main">
         <section id="introduction">
             <h2>Introduction</h2>
-            <p>Welcome to the NabeelScript documentation. NabeelScript is a simple, interpreted programming language designed for educational purposes. It supports basic arithmetic operations, variable assignments, and print statements.</p>
+            <p>Welcome to the NabeelScript documentation. NabeelScript is a simple, interpreted programming language designed for educational purposes. It supports basic arithmetic operations, variable assignments, boolean operations, arrays, and string manipulation functions.</p>
         </section>
 
         <section id="syntax">
@@ -70,9 +70,11 @@
             <pre><code>// This is a comment</code></pre>
 
             <h3>Print Statement</h3>
-            <p>The <code>print</code> statement is used to output values to the console. It can print numbers and strings.</p>
+            <p>The <code>print</code> statement is used to output values to the console. It can print numbers, strings, booleans, and arrays.</p>
             <pre><code>print 1 + 2 * 3;
-print "Hello, World!";</code></pre>
+print "Hello, World!";
+print true;
+print [1, 2, 3, 4, 5];</code></pre>
 
             <h3>Variables</h3>
             <p>Variables can be assigned using the <code>=</code> operator. Variable names must start with a letter and can contain letters and digits.</p>
@@ -86,30 +88,66 @@ print x + y;</code></pre>
 print 10 - 5;
 print 10 * 5;
 print 10 / 5;</code></pre>
+
+            <h3>Boolean Operations</h3>
+            <p>NabeelScript supports boolean operations and comparisons.</p>
+            <pre><code>print true && false; // Logical AND
+print true || false; // Logical OR
+print !true; // Logical NOT
+print 5 > 3; // Greater than
+print 10 == 10; // Equal to
+print x < y && y > 10; // Combined comparison</code></pre>
+
+            <h3>Arrays</h3>
+            <p>NabeelScript supports array creation, indexing, and manipulation.</p>
+            <pre><code>arr = [1, 2, 3, 4, 5];
+print arr[2];  // Outputs: 3
+
+sentence = "Hello world";
+words = split(sentence, " ");
+print words[1];  // Outputs: world</code></pre>
+
+            <h3>String Functions</h3>
+            <p>NabeelScript provides functions for string manipulation: join, split, and count.</p>
+            <pre><code>print join("-", ["apple", "banana", "cherry"]);  // Outputs: apple-banana-cherry
+print split("apple-banana-cherry", "-");   // Outputs: ["apple", "banana", "cherry"]
+print count("banana banana banana", "ana"); // Outputs: 3
+print count(["apple", "banana", "apple"], "apple"); // Outputs: 2</code></pre>
         </section>
 
         <section id="examples">
             <h2>Examples</h2>
-            <h3>Example 1: Basic Arithmetic</h3>
-            <pre><code>print 1 + 2 * 3;</code></pre>
-
-            <h3>Example 2: Variable Assignment</h3>
+            <h3>Example 1: Basic Arithmetic and Boolean Operations</h3>
             <pre><code>x = 10;
 y = 20;
-print x + y;</code></pre>
+print x + y;
+print x < y && y > 15;</code></pre>
 
-            <h3>Example 3: Combined Operations</h3>
+            <h3>Example 2: Array Manipulation</h3>
+            <pre><code>arr = [1, 2, 3, 4, 5];
+print arr[2];
+print join(", ", arr);</code></pre>
+
+            <h3>Example 3: String Manipulation</h3>
+            <pre><code>sentence = "Hello, World! How are you?";
+words = split(sentence, " ");
+print words;
+print count(words, "are");</code></pre>
+
+            <h3>Example 4: Combined Operations</h3>
             <pre><code>a = 5;
 b = 10;
 c = a * b + (a - b) / 2;
-print c;</code></pre>
+print c;
+print c > 20 && c < 50;</code></pre>
 
-            <h3>Example 4: Printing Strings</h3>
-            <pre><code>print "Hello, World!";</code></pre>
-
-            <h3>Example 5: Comments</h3>
-            <pre><code>// This is a comment
-print 1 + 2 * 3; // This will print 7</code></pre>
+            <h3>Example 5: Complex Example</h3>
+            <pre><code>// This is a complex example
+numbers = [1, 2, 3, 4, 5];
+sum = numbers[0] + numbers[1] + numbers[2] + numbers[3] + numbers[4];
+average = sum / 5;
+print "The average is: " + average;
+print "Is the average greater than 3? " + (average > 3);</code></pre>
         </section>
     </div>
 </body>
