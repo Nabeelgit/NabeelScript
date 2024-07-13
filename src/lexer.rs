@@ -42,6 +42,10 @@ pub enum Token {
     Lowercase,
     Trim,
     Replace,
+    Push,
+    Pop,
+    First,
+    Last,
 }
 
 pub struct Lexer {
@@ -185,6 +189,10 @@ impl Lexer {
                     "lowercase" => Ok(Token::Lowercase),
                     "trim" => Ok(Token::Trim),
                     "replace" => Ok(Token::Replace),
+                    "push" => Ok(Token::Push),
+                    "pop" => Ok(Token::Pop),
+                    "first" => Ok(Token::First),
+                    "last" => Ok(Token::Last),
                     _ => Ok(Token::Identifier(ident)),
                 }
             }

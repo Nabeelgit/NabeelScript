@@ -265,7 +265,9 @@ impl Parser {
                 self.eat(Token::RParen)?;
                 Ok(expr)
             }
-            Token::Join | Token::Split | Token::Count | Token::Length | Token::Uppercase | Token::Lowercase | Token::Trim | Token::Replace => {
+            Token::Join | Token::Split | Token::Count |
+            Token::Length | Token::Uppercase | Token::Lowercase | Token::Trim | Token::Replace |
+            Token::Push | Token::Pop | Token::First | Token::Last => {
                 let func_name = match &self.current_token {
                     Token::Join => "join",
                     Token::Split => "split",
@@ -275,6 +277,10 @@ impl Parser {
                     Token::Lowercase => "lowercase",
                     Token::Trim => "trim",
                     Token::Replace => "replace",
+                    Token::Push => "push",
+                    Token::Pop => "pop",
+                    Token::First => "first",
+                    Token::Last => "last",
                     _ => unreachable!(),
                 };
                 self.eat(self.current_token.clone())?;

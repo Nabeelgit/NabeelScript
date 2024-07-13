@@ -81,6 +81,10 @@ impl Evaluator {
                     "lowercase" => self.lowercase_function(args),
                     "trim" => self.trim_function(args),
                     "replace" => self.replace_function(args),
+                    "push" => self.push_function(args),
+                    "pop" => self.pop_function(args),
+                    "first" => self.first_function(args),
+                    "last" => self.last_function(args),
                     _ => Err(format!("Unknown function: {}", name)),
                 }
             }
@@ -274,7 +278,8 @@ impl Evaluator {
         let arg = self.eval(Rc::clone(&args[0]))?.unwrap();
         match arg {
             Value::String(s) => Ok(Some(Value::Number(s.len() as i64))),
-            _ => Err("length function argument must be a string".to_string()),
+            Value::Array(arr) => Ok(Some(Value::Number(arr.len() as i64))),
+            _ => Err("length function argument must be a string or an array".to_string()),
         }
     }
 
@@ -323,6 +328,72 @@ impl Evaluator {
                 Ok(Some(Value::String(s.replace(&p, &r))))
             }
             _ => Err("replace function arguments must be strings".to_string()),
+        }
+    }
+
+    fn push_function(&mut self, args: &[Rc<RefCell<ASTNode>>]) -> Result<Option<Value>, String> {
+        if args.len() != 2 {
+            return Err("push function requires 2 arguments".to_string());
+        }
+        let array = self.eval(Rc::clone(&args[0]))?.unwrap();
+        let element = self.eval(Rc::clone(&args[1]))?.unwrap();
+        match array {
+            Value::Array(mut arr) => {
+                arr.push(element);
+                Ok(Some(Value::Array(arr)))
+            }
+            _ => Err("First argument of push must be an array".to_string()),
+        }
+    }
+
+    fn pop_function(&mut self, args: &[Rc<RefCell<ASTNode>>]) -> Result<Option<Value>, String> {
+        if args.len() != 1 {
+            return Err("pop function requires 1 argument".to_string());
+        }
+        let array = self.eval(Rc::clone(&args[0]))?.unwrap();
+        match array {
+            Value::Array(mut arr) => {
+                if let Some(last) = arr.pop() {
+                    Ok(Some(last))
+                } else {
+                    Err("Cannot pop from an empty array".to_string())
+                }
+            }
+            _ => Err("Argument of pop must be an array".to_string()),
+        }
+    }
+
+    fn first_function(&mut self, args: &[Rc<RefCell<ASTNode>>]) -> Result<Option<Value>, String> {
+        if args.len() != 1 {
+            return Err("first function requires 1 argument".to_string());
+        }
+        let array = self.eval(Rc::clone(&args[0]))?.unwrap();
+        match array {
+            Value::Array(arr) => {
+                if let Some(first) = arr.first() {
+                    Ok(Some(first.clone()))
+                } else {
+                    Err("Array is empty".to_string())
+                }
+            }
+            _ => Err("Argument of first must be an array".to_string()),
+        }
+    }
+
+    fn last_function(&mut self, args: &[Rc<RefCell<ASTNode>>]) -> Result<Option<Value>, String> {
+        if args.len() != 1 {
+            return Err("last function requires 1 argument".to_string());
+        }
+        let array = self.eval(Rc::clone(&args[0]))?.unwrap();
+        match array {
+            Value::Array(arr) => {
+                if let Some(last) = arr.last() {
+                    Ok(Some(last.clone()))
+                } else {
+                    Err("Array is empty".to_string())
+                }
+            }
+            _ => Err("Argument of last must be an array".to_string()),
         }
     }
 }

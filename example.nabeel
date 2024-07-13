@@ -96,9 +96,32 @@ for (i = 0; i < 5; i = i + 1) {
     print i;
 }
 
+// String functions
 text = "  Hello, World!  ";
-print length(text);  // Outputs: 16
-print uppercase(text);  // Outputs: "  HELLO, WORLD!  "
-print lowercase(text);  // Outputs: "  hello, world!  "
-print trim(text);  // Outputs: "Hello, World!"
-print replace(text, "World", "NabeelScript");  // Outputs: "  Hello, NabeelScript!  "
+print length(text);
+print uppercase(text);
+print lowercase(text);
+print trim(text);
+print replace(text, "World", "NabeelScript");
+
+// Array functions
+arr = [1, 2, 3, 4, 5];
+print arr;
+arr = push(arr, 6);
+print arr;
+popped = pop(arr);
+print popped;
+print arr;
+print length(arr);
+print first(arr);
+print last(arr);
+
+// Join and split functions
+words = split("apple,banana,cherry", ",");
+print words;
+joined = join("-", words);
+print joined;
+
+// Count function
+sentence = "How much wood would a woodchuck chuck if a woodchuck could chuck wood?";
+print count(sentence, "wood");
