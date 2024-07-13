@@ -76,6 +76,11 @@ impl Evaluator {
                     "join" => self.join_function(args),
                     "split" => self.split_function(args),
                     "count" => self.count_function(args),
+                    "length" => self.length_function(args),
+                    "uppercase" => self.uppercase_function(args),
+                    "lowercase" => self.lowercase_function(args),
+                    "trim" => self.trim_function(args),
+                    "replace" => self.replace_function(args),
                     _ => Err(format!("Unknown function: {}", name)),
                 }
             }
@@ -259,6 +264,65 @@ impl Evaluator {
                 Ok(Some(Value::Number(count as i64)))
             }
             _ => Err("count function arguments must be (string, string) or (array, string)".to_string()),
+        }
+    }
+
+    fn length_function(&mut self, args: &[Rc<RefCell<ASTNode>>]) -> Result<Option<Value>, String> {
+        if args.len() != 1 {
+            return Err("length function requires 1 argument".to_string());
+        }
+        let arg = self.eval(Rc::clone(&args[0]))?.unwrap();
+        match arg {
+            Value::String(s) => Ok(Some(Value::Number(s.len() as i64))),
+            _ => Err("length function argument must be a string".to_string()),
+        }
+    }
+
+    fn uppercase_function(&mut self, args: &[Rc<RefCell<ASTNode>>]) -> Result<Option<Value>, String> {
+        if args.len() != 1 {
+            return Err("uppercase function requires 1 argument".to_string());
+        }
+        let arg = self.eval(Rc::clone(&args[0]))?.unwrap();
+        match arg {
+            Value::String(s) => Ok(Some(Value::String(s.to_uppercase()))),
+            _ => Err("uppercase function argument must be a string".to_string()),
+        }
+    }
+
+    fn lowercase_function(&mut self, args: &[Rc<RefCell<ASTNode>>]) -> Result<Option<Value>, String> {
+        if args.len() != 1 {
+            return Err("lowercase function requires 1 argument".to_string());
+        }
+        let arg = self.eval(Rc::clone(&args[0]))?.unwrap();
+        match arg {
+            Value::String(s) => Ok(Some(Value::String(s.to_lowercase()))),
+            _ => Err("lowercase function argument must be a string".to_string()),
+        }
+    }
+
+    fn trim_function(&mut self, args: &[Rc<RefCell<ASTNode>>]) -> Result<Option<Value>, String> {
+        if args.len() != 1 {
+            return Err("trim function requires 1 argument".to_string());
+        }
+        let arg = self.eval(Rc::clone(&args[0]))?.unwrap();
+        match arg {
+            Value::String(s) => Ok(Some(Value::String(s.trim().to_string()))),
+            _ => Err("trim function argument must be a string".to_string()),
+        }
+    }
+
+    fn replace_function(&mut self, args: &[Rc<RefCell<ASTNode>>]) -> Result<Option<Value>, String> {
+        if args.len() != 3 {
+            return Err("replace function requires 3 arguments".to_string());
+        }
+        let string = self.eval(Rc::clone(&args[0]))?.unwrap();
+        let pattern = self.eval(Rc::clone(&args[1]))?.unwrap();
+        let replacement = self.eval(Rc::clone(&args[2]))?.unwrap();
+        match (string, pattern, replacement) {
+            (Value::String(s), Value::String(p), Value::String(r)) => {
+                Ok(Some(Value::String(s.replace(&p, &r))))
+            }
+            _ => Err("replace function arguments must be strings".to_string()),
         }
     }
 }

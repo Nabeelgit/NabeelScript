@@ -37,6 +37,11 @@ pub enum Token {
     RBrace,
     While,
     For,
+    Length,
+    Uppercase,
+    Lowercase,
+    Trim,
+    Replace,
 }
 
 pub struct Lexer {
@@ -175,6 +180,11 @@ impl Lexer {
                     "elseif" => Ok(Token::ElseIf),
                     "while" => Ok(Token::While),
                     "for" => Ok(Token::For),
+                    "length" => Ok(Token::Length),
+                    "uppercase" => Ok(Token::Uppercase),
+                    "lowercase" => Ok(Token::Lowercase),
+                    "trim" => Ok(Token::Trim),
+                    "replace" => Ok(Token::Replace),
                     _ => Ok(Token::Identifier(ident)),
                 }
             }

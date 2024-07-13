@@ -95,3 +95,10 @@ while i < 5 {
 for (i = 0; i < 5; i = i + 1) {
     print i;
 }
+
+text = "  Hello, World!  ";
+print length(text);  // Outputs: 16
+print uppercase(text);  // Outputs: "  HELLO, WORLD!  "
+print lowercase(text);  // Outputs: "  hello, world!  "
+print trim(text);  // Outputs: "Hello, World!"
+print replace(text, "World", "NabeelScript");  // Outputs: "  Hello, NabeelScript!  "
