@@ -85,6 +85,8 @@ impl Evaluator {
                     "pop" => self.pop_function(args),
                     "first" => self.first_function(args),
                     "last" => self.last_function(args),
+                    "read_file" => self.read_file_function(args),
+                    "write_file" => self.write_file_function(args),
                     _ => Err(format!("Unknown function: {}", name)),
                 }
             }
@@ -394,6 +396,35 @@ impl Evaluator {
                 }
             }
             _ => Err("Argument of last must be an array".to_string()),
+        }
+    }
+
+    fn read_file_function(&mut self, args: &[Rc<RefCell<ASTNode>>]) -> Result<Option<Value>, String> {
+        if args.len() != 1 {
+            return Err("read_file function requires 1 argument".to_string());
+        }
+        let file_path = self.eval(Rc::clone(&args[0]))?.unwrap();
+        match file_path {
+            Value::String(path) => {
+                use std::fs;
+                fs::read_to_string(path).map(Value::String).map(Some).map_err(|e| e.to_string())
+            }
+            _ => Err("Argument to read_file must be a string".to_string()),
+        }
+    }
+
+    fn write_file_function(&mut self, args: &[Rc<RefCell<ASTNode>>]) -> Result<Option<Value>, String> {
+        if args.len() != 2 {
+            return Err("write_file function requires 2 arguments".to_string());
+        }
+        let file_path = self.eval(Rc::clone(&args[0]))?.unwrap();
+        let data = self.eval(Rc::clone(&args[1]))?.unwrap();
+        match (file_path, data) {
+            (Value::String(path), Value::String(contents)) => {
+                use std::fs;
+                fs::write(path, contents).map(|_| None).map_err(|e| e.to_string())
+            }
+            _ => Err("Arguments to write_file must be strings".to_string()),
         }
     }
 }

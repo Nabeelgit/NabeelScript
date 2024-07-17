@@ -309,6 +309,25 @@ impl Parser {
                 self.eat(Token::RBracket)?;
                 Ok(Rc::new(RefCell::new(ASTNode::Array(elements))))
             }
+            Token::ReadFile | Token::WriteFile => {
+                let func_name = match &self.current_token {
+                    Token::ReadFile => "read_file",
+                    Token::WriteFile => "write_file",
+                    _ => unreachable!(),
+                };
+                self.eat(self.current_token.clone())?;
+                self.eat(Token::LParen)?;
+                let mut args = Vec::new();
+                if self.current_token != Token::RParen {
+                    args.push(self.parse_expression()?);
+                    while self.current_token == Token::Comma {
+                        self.eat(Token::Comma)?;
+                        args.push(self.parse_expression()?);
+                    }
+                }
+                self.eat(Token::RParen)?;
+                Ok(Rc::new(RefCell::new(ASTNode::FunctionCall(func_name.to_string(), args))))
+            }
             _ => Err(format!("Unexpected token: {:?}", self.current_token)),
         }
     }

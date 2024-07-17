@@ -46,6 +46,8 @@ pub enum Token {
     Pop,
     First,
     Last,
+    ReadFile,
+    WriteFile,
 }
 
 pub struct Lexer {
@@ -170,7 +172,7 @@ impl Lexer {
             }
             Some('"') => self.read_string().map(Token::StringLiteral),
             Some(c) if c.is_digit(10) => self.read_number().map(Token::Number),
-            Some(c) if c.is_alphabetic() => {
+            Some(c) if c.is_alphabetic() || c == '_' => {
                 let ident = self.read_identifier();
                 match ident.as_str() {
                     "print" => Ok(Token::Print),
@@ -193,6 +195,8 @@ impl Lexer {
                     "pop" => Ok(Token::Pop),
                     "first" => Ok(Token::First),
                     "last" => Ok(Token::Last),
+                    "read_file" => Ok(Token::ReadFile),
+                    "write_file" => Ok(Token::WriteFile),
                     _ => Ok(Token::Identifier(ident)),
                 }
             }
@@ -243,7 +247,7 @@ impl Lexer {
 
     fn read_identifier(&mut self) -> String {
         let start = self.position - 1;
-        while self.current_char.is_some() && self.current_char.unwrap().is_alphabetic() {
+        while self.current_char.is_some() && (self.current_char.unwrap().is_alphabetic() || self.current_char.unwrap() == '_') {
             self.read_char();
         }
         self.input[start..self.position - 1].to_string()

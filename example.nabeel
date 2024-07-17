@@ -125,3 +125,10 @@ print joined;
 // Count function
 sentence = "How much wood would a woodchuck chuck if a woodchuck could chuck wood?";
 print count(sentence, "wood");
+
+// Read from a file
+content = read_file("input.txt");
+print content;
+
+// Write to a file
+write_file("output.txt", "Hello, NabeelScript!");
