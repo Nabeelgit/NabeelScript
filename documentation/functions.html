@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NabeelScript Documentation</title>
+    <title>NabeelScript Functions</title>
     <style>
-        body {
+                body {
             font-family: Arial, sans-serif;
             line-height: 1.6;
             margin: 0;
@@ -87,7 +87,7 @@
 <body>
     <header>
         <div class="container">
-            <h1>NabeelScript Documentation</h1>
+            <h1>NabeelScript Functions</h1>
             <nav>
                 <div class="burger-menu" onclick="toggleMenu()">
                     <div class="bar"></div>
@@ -95,31 +95,47 @@
                     <div class="bar"></div>
                 </div>
                 <ul id="nav-menu">
-                    <li><a href="index.html">Home</a></li>
-                    <li><a href="documentation/syntax.html">Syntax</a></li>
-                    <li><a href="documentation/functions.html">Functions</a></li>
-                    <li><a href="documentation/control_structures.html">Control Structures</a></li>
-                    <li><a href="documentation/examples.html">Examples</a></li>
+                    <li><a href="../index.html">Home</a></li>
+                    <li><a href="syntax.html">Syntax</a></li>
+                    <li><a href="functions.html">Functions</a></li>
+                    <li><a href="control_structures.html">Control Structures</a></li>
+                    <li><a href="examples.html">Examples</a></li>
                 </ul>
             </nav>
         </div>
     </header>
     <div class="container main">
-        <section id="introduction">
-            <h2>Introduction</h2>
-            <p>Welcome to the NabeelScript documentation. NabeelScript is a simple, interpreted programming language designed for educational purposes. It supports basic arithmetic operations, variable assignments, boolean operations, arrays, string manipulation functions, and control structures.</p>
-        </section>
+        <h2>Built-in Functions</h2>
 
-        <section id="quick-start">
-            <h2>Quick Start</h2>
-            <p>To get started with NabeelScript, check out the following sections:</p>
-            <ul>
-                <li><a href="./documentation/syntax.html">Syntax</a> - Learn about the basic syntax of NabeelScript</li>
-                <li><a href="./documentation/functions.html">Functions</a> - Explore the built-in functions in NabeelScript</li>
-                <li><a href="./documentation/control_structures.html">Control Structures</a> - Understand how to control the flow of your programs</li>
-                <li><a href="./documentation/examples.html">Examples</a> - See NabeelScript in action with various examples</li>
-            </ul>
-        </section>
+        <h3>Print Function</h3>
+        <pre><code>print("Hello, World!");</code></pre>
+
+        <h3>String Functions</h3>
+        <pre><code>length("Hello");  // Returns 5
+uppercase("hello");  // Returns "HELLO"
+lowercase("WORLD");  // Returns "world"
+trim("  Hello  ");  // Returns "Hello"
+replace("Hello, World!", "World", "NabeelScript");  // Returns "Hello, NabeelScript!"</code></pre>
+
+        <h3>Array Functions</h3>
+        <pre><code>arr = [1, 2, 3, 4, 5];
+push(arr, 6);  // Returns [1, 2, 3, 4, 5, 6]
+pop(arr);  // Returns 5, arr becomes [1, 2, 3, 4]
+length(arr);  // Returns 4
+first(arr);  // Returns 1
+last(arr);  // Returns 4</code></pre>
+
+        <h3>Join and Split Functions</h3>
+        <pre><code>join("-", ["apple", "banana", "cherry"]);  // Returns "apple-banana-cherry"
+split("apple,banana,cherry", ",");  // Returns ["apple", "banana", "cherry"]</code></pre>
+
+        <h3>Count Function</h3>
+        <pre><code>count("Hello, World!", "l");  // Returns 3
+count(["apple", "banana", "apple"], "apple");  // Returns 2</code></pre>
+
+        <h3>File Operations</h3>
+        <pre><code>content = read_file("input.txt");
+write_file("output.txt", "Hello, NabeelScript!");</code></pre>
     </div>
 
     <script>

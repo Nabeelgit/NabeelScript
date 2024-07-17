@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NabeelScript Documentation</title>
+    <title>NabeelScript Control Structures</title>
     <style>
-        body {
+                body {
             font-family: Arial, sans-serif;
             line-height: 1.6;
             margin: 0;
@@ -87,7 +87,7 @@
 <body>
     <header>
         <div class="container">
-            <h1>NabeelScript Documentation</h1>
+            <h1>NabeelScript Control Structures</h1>
             <nav>
                 <div class="burger-menu" onclick="toggleMenu()">
                     <div class="bar"></div>
@@ -95,31 +95,38 @@
                     <div class="bar"></div>
                 </div>
                 <ul id="nav-menu">
-                    <li><a href="index.html">Home</a></li>
-                    <li><a href="documentation/syntax.html">Syntax</a></li>
-                    <li><a href="documentation/functions.html">Functions</a></li>
-                    <li><a href="documentation/control_structures.html">Control Structures</a></li>
-                    <li><a href="documentation/examples.html">Examples</a></li>
+                    <li><a href="../index.html">Home</a></li>
+                    <li><a href="syntax.html">Syntax</a></li>
+                    <li><a href="functions.html">Functions</a></li>
+                    <li><a href="control_structures.html">Control Structures</a></li>
+                    <li><a href="examples.html">Examples</a></li>
                 </ul>
             </nav>
         </div>
     </header>
     <div class="container main">
-        <section id="introduction">
-            <h2>Introduction</h2>
-            <p>Welcome to the NabeelScript documentation. NabeelScript is a simple, interpreted programming language designed for educational purposes. It supports basic arithmetic operations, variable assignments, boolean operations, arrays, string manipulation functions, and control structures.</p>
-        </section>
+        <h2>Control Structures</h2>
 
-        <section id="quick-start">
-            <h2>Quick Start</h2>
-            <p>To get started with NabeelScript, check out the following sections:</p>
-            <ul>
-                <li><a href="./documentation/syntax.html">Syntax</a> - Learn about the basic syntax of NabeelScript</li>
-                <li><a href="./documentation/functions.html">Functions</a> - Explore the built-in functions in NabeelScript</li>
-                <li><a href="./documentation/control_structures.html">Control Structures</a> - Understand how to control the flow of your programs</li>
-                <li><a href="./documentation/examples.html">Examples</a> - See NabeelScript in action with various examples</li>
-            </ul>
-        </section>
+        <h3>If-Else Statements</h3>
+        <pre><code>if x > 10 {
+    print("x is greater than 10");
+} elseif x > 5 {
+    print("x is greater than 5 but not greater than 10");
+} else {
+    print("x is 5 or less");
+}</code></pre>
+
+        <h3>While Loops</h3>
+        <pre><code>i = 0;
+while i < 5 {
+    print(i);
+    i = i + 1;
+}</code></pre>
+
+        <h3>For Loops</h3>
+        <pre><code>for (i = 0; i < 5; i = i + 1) {
+    print(i);
+}</code></pre>
     </div>
 
     <script>
